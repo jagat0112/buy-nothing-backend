@@ -4,7 +4,7 @@ const userSchema = new mongoose.Schema({
   name: { type: String, require: true, trim: true },
   password: { type: String, require: true },
   phone: { type: Number, require: true },
-  email: { type: String, require: true },
+  email: { type: String, require: true, unique: true },
   photo: String,
   giveAwayMades: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
   itemRecieved: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
