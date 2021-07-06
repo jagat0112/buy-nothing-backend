@@ -3,11 +3,13 @@ const connectDB = require("./config/db");
 const Product = require("./routes/products");
 const User = require("./routes/users");
 const Auth = require("./routes/auth");
+const cors = require("cors");
 
 const app = express();
 connectDB();
 
 app.use(express.json());
+app.use(cors());
 
 process.on("unhandledRejection", (err) => {
   console.log(err);
