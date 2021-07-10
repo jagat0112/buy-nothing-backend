@@ -5,5 +5,7 @@
   "pass": "Annapurna@",
   "baseUrl": "http://localhost:5002/api",
   "GOOGLE_CLIENT_ID": "572726044409-q4i98b3sa51esf7buq3pihmg0sm6s8be.apps.googleusercontent.com",
-  "GOOGLE_CLIENT_PASSWORD": "xX2cqsblJlcsK5RU3aZApksa"
+  "GOOGLE_CLIENT_PASSWORD": "xX2cqsblJlcsK5RU3aZApksa",
+  "TWILIO_ACCOUNT_ID": "ACc693bdc608d5ec2f2293ff62015e2490",
+  "TWILIO_AUTH_TOKEN": "b4cb5ede8677d113834eb9694aa9597e"
 }

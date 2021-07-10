@@ -1,10 +1,11 @@
 const express = require("express");
+const mongoose = require("mongoose");
+const Fawn = require("fawn");
 const Product = require("../Model/Product");
 const { User } = require("../Model/User");
 const auth = require("../middleware/auth");
 const owner = require("../middleware/owner");
-const mongoose = require("mongoose");
-const Fawn = require("fawn");
+const upload = require("../middleware/uploading");
 
 const router = express.Router();
 
@@ -159,6 +160,12 @@ router.delete("/:id", auth, owner, async (req, res) => {
   } catch (error) {
     console.error(error);
   }
+});
+
+// Adding picture
+
+router.post("/upload/:id", upload.single("image"), async (req, res) => {
+  res.send({ message: "Immage uploaded Successfully" });
 });
 
 module.exports = router;

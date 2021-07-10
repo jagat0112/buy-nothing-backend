@@ -11,8 +11,28 @@ const userSchema = new mongoose.Schema({
     maxlength: 1024,
   },
   password: { type: String, require: true, minlength: 5, maxlength: 1024 },
-  phone: { type: Number, require: true, minlength: 5, maxlength: 20 },
-  email: { type: String, require: true, unique: true },
+  phone: {
+    number: {
+      type: Number,
+      require: true,
+      minlength: 5,
+      maxlength: 20,
+      unique: true,
+    },
+    verification: {
+      type: Boolean,
+      default: false,
+    },
+    code: { type: Number },
+  },
+  email: {
+    email: { type: String, require: true, unique: true },
+    verification: {
+      type: Boolean,
+      default: false,
+      code: { type: String },
+    },
+  },
   picture: String,
   status: {
     type: String,
@@ -24,6 +44,7 @@ const userSchema = new mongoose.Schema({
   itemRecieved: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
   itemOnClaim: { type: mongoose.Schema.Types.ObjectId, ref: "Product" },
   waitlistedItem: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
+  phoneVerificationCode: Number,
   resetPasswordToken: String,
   date: { type: Date, default: Date.now },
 });

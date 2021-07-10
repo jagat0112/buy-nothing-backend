@@ -5,6 +5,8 @@ const jwt = require("jsonwebtoken");
 const { User, validate, validatePassword } = require("../Model/User");
 const { OAuth2Client } = require("google-auth-library");
 const { sendResetToken } = require("../config/nodemailer");
+const sendVerificationSMS = require("../config/send_sms");
+const auth = require("../middleware/auth");
 
 const router = express.Router();
 
@@ -33,7 +35,7 @@ router.get("/confirm/:confirmationCode", async (req, res) => {
   const { confirmationCode } = req.params;
   const user = await User.findOne({ confirmationCode });
   user.confirmationCode = "";
-  user.status = "Active";
+  user.email.verification = true;
   await user.save();
   res.status(200).send("User Activated");
 });
@@ -60,11 +62,10 @@ router.post("/googlelogin", async (req, res) => {
       );
       const newUser = new User({
         name,
-        email,
+        email: { email, verification: true },
         picture,
         password: hashed,
-        phone: 00000,
-        status: "Active",
+        phone: { number: 00000 },
       });
       await newUser.save();
       res.status(200).send(newUser);
@@ -123,6 +124,32 @@ router.put("/reset-password/:confirmationCode", async (req, res) => {
   user.resetPasswordToken = "";
   await user.save();
   res.status(200).send({ message: "Password Changed Successfully" });
+});
+
+router.get("/send-phone-verify-code", auth, async (req, res) => {
+  const user = await User.findById(req.user._id);
+  user.phone.code = Math.floor(Math.random() * 10000);
+  await user.save();
+  try {
+    await sendVerificationSMS(user.phone.number, user.phone.code);
+  } catch (error) {
+    console.log(error);
+  }
+  res.status(200).send({ message: "Verfication Code Sent." });
+});
+
+router.post("/verify-phone", auth, async (req, res) => {
+  const { code } = req.body;
+  const user = await User.findById(req.user._id);
+  if (user.phone.code == code) {
+    user.status = "Active";
+    user.phone.verification = true;
+    user.phone.code = 0;
+    await user.save();
+    res.status(200).send({ message: "Phone Number Successfully Verified" });
+  } else {
+    res.status(400).send({ message: "Invalid Token" });
+  }
 });
 
 module.exports = router;

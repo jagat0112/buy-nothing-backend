@@ -5,7 +5,6 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { User, validate, validatePassword } = require("../Model/User");
 const { sendConfirmationEmail } = require("../config/nodemailer");
-const passwordComplexity = require("joi-password-complexity");
 
 const router = express.Router();
 
@@ -24,9 +23,13 @@ router.get("/:id", async (req, res) => {
 router.post("/register", async (req, res) => {
   try {
     const { name, phone, email, photo, password } = req.body;
-    const existing = await User.findOne({ email });
+    const existing = await User.findOne({ email: { email } });
     if (existing)
       return res.status(400).send("User already exists with this email");
+    const existingNumber = await User.findOne({ phone: { number: phone } });
+    console.log(existingNumber);
+    if (existingNumber)
+      return res.status(400).send("User already exists with this number");
     const salt = await bcrypt.genSalt(10);
     const hashed = await bcrypt.hash(password, salt);
     const { error } = validate({ name, phone, email });
@@ -37,8 +40,8 @@ router.post("/register", async (req, res) => {
     if (error) return res.send(error.details[0].message);
     const user = await User.create({
       name,
-      phone,
-      email,
+      phone: { number: phone },
+      email: { email },
       photo,
       password: hashed,
       confirmationCode: jwt.sign({ email }, "123456"),
