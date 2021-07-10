@@ -5,6 +5,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { User, validate, validatePassword } = require("../Model/User");
 const { sendConfirmationEmail } = require("../config/nodemailer");
+const upload = require("../middleware/uploading");
 
 const router = express.Router();
 
@@ -57,6 +58,13 @@ router.post("/register", async (req, res) => {
   } catch (error) {
     console.error(error);
   }
+});
+
+// Adding picture
+// Have not yet programmed to upload photo in db
+
+router.post("/upload/:id", upload.single("image"), async (req, res) => {
+  res.send({ message: "Image uploaded Successfully" });
 });
 
 module.exports = router;

@@ -165,7 +165,7 @@ router.delete("/:id", auth, owner, async (req, res) => {
 // Adding picture
 
 router.post("/upload/:id", upload.single("image"), async (req, res) => {
-  res.send({ message: "Immage uploaded Successfully" });
+  res.send({ message: "Image uploaded Successfully" });
 });
 
 module.exports = router;
