@@ -1,6 +1,9 @@
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
-const client = require("twilio")(accountSid, authToken);
+const client = require("twilio")(
+  "ACc693bdc608d5ec2f2293ff62015e2490",
+  "b4cb5ede8677d113834eb9694aa9597e"
+);
 
 module.exports = (number, code) => {
   client.messages

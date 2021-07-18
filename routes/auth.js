@@ -13,22 +13,49 @@ const router = express.Router();
 const client = new OAuth2Client(config.get("GOOGLE_CLIENT_ID"));
 
 router.post("/login", async (req, res) => {
-  const { email, password } = req.body;
-  // Custom Validation
-  const { error } = validate({ email, password });
-  if (error) return res.send(error.details[0].message);
-  // Finding the user
-  const user = await User.findOne({ email });
-  if (!user) return res.status(404).send("User Not Found");
-  const logged = await bcrypt.compare(password, user.password);
+  const { email, password, phone } = req.body;
+  if (phone) {
+    const { error } = validate({ phone });
+    if (error)
+      return res.status(400).json({ message: error.details[0].message });
+    // Finding the user
+    const user = await User.findOne({ "phone.number": phone });
 
-  //   Incase of invalid Password
-  if (!logged) return res.status(403).send("Invalid Creditionals");
+    if (!user) return res.status(404).json({ message: "User Not Found" });
 
-  //   If password is correct
-  const token = jwt.sign({ _id: user._id }, config.get("jwtSecret"));
+    const logged = await bcrypt.compare(password, user.password);
 
-  res.status(200).send(token);
+    //   Incase of invalid Password
+    if (!logged) {
+      return res.status(403).json({ message: "Invalid Creditionals" });
+    }
+
+    //   If password is correct
+    const token = jwt.sign({ _id: user._id }, config.get("jwtSecret"));
+
+    res.status(200).json({ token, success: true });
+  } else {
+    // Custom Validation
+    const { error } = validate({ email });
+    if (error)
+      return res.status(400).json({ message: error.details[0].message });
+    // Finding the user
+    const user = await User.findOne({ "email.email": email });
+    if (!user) {
+      return res.status(404).json({ message: "User Not Found" });
+    }
+
+    const logged = await bcrypt.compare(password, user.password);
+
+    //   Incase of invalid Password
+    if (!logged)
+      return res.status(403).json({ message: "Invalid Username Password" });
+
+    //   If password is correct
+    const token = jwt.sign({ _id: user._id }, config.get("jwtSecret"));
+
+    res.status(200).send(token);
+  }
 });
 
 router.get("/confirm/:confirmationCode", async (req, res) => {
@@ -37,7 +64,7 @@ router.get("/confirm/:confirmationCode", async (req, res) => {
   user.confirmationCode = "";
   user.email.verification = true;
   await user.save();
-  res.status(200).send("User Activated");
+  res.status(200).json({ message: "User Activated" });
 });
 
 router.post("/googlelogin", async (req, res) => {
@@ -150,6 +177,11 @@ router.post("/verify-phone", auth, async (req, res) => {
   } else {
     res.status(400).send({ message: "Invalid Token" });
   }
+});
+
+router.get("/me", auth, async (req, res) => {
+  const user = await User.findById(req.user._id).select("-password");
+  res.json({ user: user });
 });
 
 module.exports = router;

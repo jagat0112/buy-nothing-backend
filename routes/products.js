@@ -15,7 +15,7 @@ var task = Fawn.Task();
 
 router.get("/", async (req, res) => {
   try {
-    const product = await Product.find().populate("claimedBy", "name");
+    const product = await Product.find().populate("author", "name");
     res.status(200).send(product);
   } catch (error) {
     console.error(error);

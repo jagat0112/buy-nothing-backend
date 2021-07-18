@@ -4,37 +4,14 @@ const Product = require("./routes/products");
 const User = require("./routes/users");
 const Auth = require("./routes/auth");
 const cors = require("cors");
-const multer = require("multer");
-const path = require("path");
 
 const app = express();
 connectDB();
+app.use(express.static("images"));
 
 app.set("view engine", "ejs");
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "Images");
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname));
-  },
-});
-const upload = multer({ storage: storage });
-
-// const upload = multer({ storage: storage });
-app.get("/uploads", function (req, res) {
-  res.render("upload");
-});
-
-app.post("/uploads", upload.single("image"), (req, res) => {
-  console.log(req.file.mimetype);
-  if (req.file.mimetype !== "image/jpeg")
-    return res
-      .status(401)
-      .send({ message: "Only image files can be uploaded" });
-  res.json({ message: "Successfully uploaded files" });
-});
+app.use("/public", express.static("Images"));
 
 app.use(express.json());
 app.use(cors());

@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const productSchema = new mongoose.Schema({
   name: { type: String, require: true, trim: true },
-  descripton: { type: String, require: true, trim: true, min: 5, max: 500 },
+  descripton: { type: String, trim: true, min: 5, max: 200 },
   type: {
     type: String,
     enum: ["clothings", "smartPhone", "books"],
@@ -12,7 +12,10 @@ const productSchema = new mongoose.Schema({
   pickUpTime: String,
   claimedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   giveAwayComplete: { type: Boolean, default: false },
-  photo: String,
+  photo: {
+    type: String,
+    default: "no-photo.jpg",
+  },
   waitlist: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   author: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   date: { type: Date, default: Date.now },
